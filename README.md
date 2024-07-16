@@ -20,7 +20,7 @@ Currently, two official plugins are available:
 3. **Configure Environment Variables**
     - Create a .env file in the root directory and add the necessary environment variables:
     ```bash
-    VITE_FIREBASE_API_KEY="AIzaSyDwxG1JYySORI7wQn1zWeZInw0U2uujcvo"
+    VITE_FIREBASE_API_KEY="example"
 	VITE_FIREBASE_AUTH_DOMAIN="example"
 	VITE_FIREBASE_PROJECT_ID="example"
 	VITE_FIREBASE_STORAGE_BUCKET="example"
