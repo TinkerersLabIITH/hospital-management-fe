@@ -10,7 +10,7 @@ import SortIcon from "../assets/sort.svg";
 function Profile(PatientDetails) {
   return (
     <div className="m-0 p-0 w-screen min-h-screen flex-col gap-y-16 overflow-x-hidden justify-center items-center">
-      <div className="bg-gray-300">
+      <div className="bg-gray-300 overflow-x-hidden mb-20">
         <header className="flex justify-between items-center font-semibold text-4xl w-11/12 m-auto p-10 mb-12">
           <div className="flex-col gap-0.5 justify-center">
             <h1>14 Airforce Hospital</h1>
@@ -143,38 +143,105 @@ function Profile(PatientDetails) {
             </div>
           </div>
           <div>
-            <table className="text-left w-full mt-2">
-              <tr className="text-sm justify-between gap-16 p-2">
-                <th>
-                  <div className="flex items-center gap-2">
-                    # <img src={SortIcon} alt="" />
-                  </div>
-                </th>
-
-                <th>
-                  <div className=" flex items-center gap-2">
-                    Name <img src={SortIcon} alt="" />
-                  </div>
-                </th>
-                <th className="">Description </th>
-                <th>
-                  <div className=" flex items-center gap-2">
-                    Status <img src={SortIcon} alt="" />
-                  </div>
-                </th>
-                <th className="text-right">Property </th>
-              </tr>
-              <tr className=" items-center justify-between gap-16 text-normal p-2">
-                <th className=" items-center gap-2">1</th>
-                <th className=" items-center gap-2">Test Name</th>
-                <th className="flex-1">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste,
-                  sunt.
-                </th>
-                <th className=" items-center gap-2">Pending</th>
-                <th className="text-right">Value</th>
-              </tr>
-            </table>
+            <div className="max-h-80 overflow-y-scroll overflow-x-hidden">
+              <table className="text-left w-full mt-2">
+                <thead>
+                  <tr className="text-sm justify-between gap-16 p-2">
+                    <th>
+                      <div className="flex items-center gap-2">
+                        # <img src={SortIcon} alt="" />
+                      </div>
+                    </th>
+                    <th>
+                      <div className="flex items-center gap-2">
+                        Name <img src={SortIcon} alt="" />
+                      </div>
+                    </th>
+                    <th className="">Description </th>
+                    <th>
+                      <div className="flex items-center gap-2">
+                        Status <img src={SortIcon} alt="" />
+                      </div>
+                    </th>
+                    <th className="text-right">Property </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="text-normal bg-gray-100 relative">
+                    <td className="p-4">1</td>
+                    <td className="">Test Name</td>
+                    <td className="flex-1">
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Iste, sunt.
+                    </td>
+                    <td className="p-2 pl-4 pr-4 bg-yellow-100 z-10 text-yellow-700 text-center rounded-3xl mt-2 absolute">
+                      Pending
+                    </td>
+                    <td className="text-right p-4">Value</td>
+                  </tr>
+                  <tr className="text-normal bg-gray-100 relative">
+                    <td className="p-4">1</td>
+                    <td className="">Test Name</td>
+                    <td className="flex-1">
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Iste, sunt.
+                    </td>
+                    <td className="p-2 pl-4 pr-4 bg-yellow-100 z-10 text-yellow-700 text-center rounded-3xl mt-2 absolute">
+                      Pending
+                    </td>
+                    <td className="text-right p-4">Value</td>
+                  </tr>
+                  <tr className="text-normal bg-gray-100 relative">
+                    <td className="p-4">1</td>
+                    <td className="">Test Name</td>
+                    <td className="flex-1">
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Iste, sunt.
+                    </td>
+                    <td className="p-2 pl-4 pr-4 bg-yellow-100 z-10 text-yellow-700 text-center rounded-3xl mt-2 absolute">
+                      Pending
+                    </td>
+                    <td className="text-right p-4">Value</td>
+                  </tr>
+                  <tr className="text-normal bg-gray-100 relative">
+                    <td className="p-4">1</td>
+                    <td className="">Test Name</td>
+                    <td className="flex-1">
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Iste, sunt.
+                    </td>
+                    <td className="p-2 pl-4 pr-4 bg-yellow-100 z-10 text-yellow-700 text-center rounded-3xl mt-2 absolute">
+                      Pending
+                    </td>
+                    <td className="text-right p-4">Value</td>
+                  </tr>
+                  <tr className="text-normal bg-gray-100 relative">
+                    <td className="p-4">1</td>
+                    <td className="">Test Name</td>
+                    <td className="flex-1">
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Iste, sunt.
+                    </td>
+                    <td className="p-2 pl-4 pr-4 bg-yellow-100 z-10 text-yellow-700 text-center rounded-3xl mt-2 absolute">
+                      Pending
+                    </td>
+                    <td className="text-right p-4">Value</td>
+                  </tr>
+                  <tr className="text-normal bg-gray-100 relative">
+                    <td className="p-4">1</td>
+                    <td className="">Test Name</td>
+                    <td className="flex-1">
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Iste, sunt.
+                    </td>
+                    <td className="p-2 pl-4 pr-4 bg-yellow-100 z-10 text-yellow-700 text-center rounded-3xl mt-2 absolute">
+                      Pending
+                    </td>
+                    <td className="text-right p-4">Value</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
