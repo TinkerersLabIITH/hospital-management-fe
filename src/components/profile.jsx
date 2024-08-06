@@ -27,7 +27,7 @@ function Profile({ PatientDetails }) {
       <div className="identity flex m-auto p-0 w-10/12 gap-16 mb-20">
         <div className="id bg-blue-200 rounded-2xl p-10">
           <div className="box flex gap-2 ">
-            <div className="image mr-8 border-2 border-gray-400 rounded-2xl">
+            <div className="image mr-8 border-2 border-gray-400 rounded-2xl w-48 h-48">
               <img
                 src={PatientDetails.img || Image}
                 className="w-48 h-48 rounded-2xl"
@@ -182,7 +182,7 @@ function Profile({ PatientDetails }) {
                     <td className="text-right p-4">Value</td>
                   </tr>
                   <tr className="text-normal bg-gray-100 relative">
-                    <td className="p-4">1</td>
+                    <td className="p-4">2</td>
                     <td className="">Test Name</td>
                     <td className="flex-1">
                       Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -194,7 +194,7 @@ function Profile({ PatientDetails }) {
                     <td className="text-right p-4">Value</td>
                   </tr>
                   <tr className="text-normal bg-gray-100 relative">
-                    <td className="p-4">1</td>
+                    <td className="p-4">3</td>
                     <td className="">Test Name</td>
                     <td className="flex-1">
                       Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -206,7 +206,7 @@ function Profile({ PatientDetails }) {
                     <td className="text-right p-4">Value</td>
                   </tr>
                   <tr className="text-normal bg-gray-100 relative">
-                    <td className="p-4">1</td>
+                    <td className="p-4">4</td>
                     <td className="">Test Name</td>
                     <td className="flex-1">
                       Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -218,7 +218,7 @@ function Profile({ PatientDetails }) {
                     <td className="text-right p-4">Value</td>
                   </tr>
                   <tr className="text-normal bg-gray-100 relative">
-                    <td className="p-4">1</td>
+                    <td className="p-4">5</td>
                     <td className="">Test Name</td>
                     <td className="flex-1">
                       Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -230,7 +230,7 @@ function Profile({ PatientDetails }) {
                     <td className="text-right p-4">Value</td>
                   </tr>
                   <tr className="text-normal bg-gray-100 relative">
-                    <td className="p-4">1</td>
+                    <td className="p-4">6</td>
                     <td className="">Test Name</td>
                     <td className="flex-1">
                       Lorem ipsum dolor sit amet consectetur adipisicing elit.
