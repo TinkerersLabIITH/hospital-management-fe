@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { signInWithGoogle } from "./firebaseConfig";
+import FlagImage from "./assets/flag.jpg"
 import axios from "axios";
 import Profile from "./components/profile";
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from "react-router-dom";
@@ -38,8 +39,8 @@ function App() {
         <Route
           path="/"
           element={
-            <div className="w-screen text-center">
-              <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+            <div className="w-screen text-center flex w-screen h-screen justify-end items-start overflow-hidden bg-gray-400 bg-no-repeat bg-cover" style={{backgroundImage:`url(${FlagImage})`}}>
+              <div className="bg-gray-200 p-8 rounded shadow-md w-full max-w-md m-10">
                 <h1 className="text-center">Hospital Management System</h1>
                 <button
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
@@ -61,7 +62,7 @@ function ProfileWrapper() {
   const location = useLocation();
   const { name, authLevel } = location.state || {};
 
-  return <Profile PatientDetails={{ name, authLevel }} />;
+  return <Profile PatientDetails={{ name: name, authLevel: authLevel, img: "" }} />;
 }
 
 function AppWrapper() {
