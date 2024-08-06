@@ -1,39 +1,75 @@
-import React from 'react';
-import { signInWithGoogle } from './firebaseConfig';
-import axios from 'axios';
+import React, { useState } from "react";
+import { signInWithGoogle } from "./firebaseConfig";
+import axios from "axios";
+import Profile from "./components/profile";
+import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from "react-router-dom";
 
 function App() {
+  const [name, setName] = useState("");
+  const [authLevel, setAuthLevel] = useState("");
+  const navigate = useNavigate();
+
   const handleLogin = async () => {
-    try{
+    try {
       const result = await signInWithGoogle();
       const { user } = result;
-      const emailID = user["email"];
-      const name = user["displayName"];
+      const emailID = user.email;
+      const displayName = user.displayName;
 
-      const response = await axios.post(import.meta.env.VITE_SERVER_URI+'/api/auth/fetch',{ emailID: emailID });
+      const response = await axios.post(
+        import.meta.env.VITE_SERVER_URI + "/api/auth/fetch",
+        { emailID }
+      );
 
-      if(response.data["authLevel"]){
-        alert(`Welcome, ${name} (${response.data["authLevel"]})`);
+      if (response.data.authLevel) {
+        setName(displayName);
+        setAuthLevel(response.data.authLevel);
+        navigate("/profile", { state: { name: displayName, authLevel: response.data.authLevel } });
       }
-    }
-    catch(error){
+    } catch (error) {
       console.error(error);
-      alert('Authentication failed');
+      alert("Authentication failed");
     }
   };
 
   return (
-    <>
-      <div className='w-screen text-center'>
-        <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-          <h1 className="text-center">Hospital Management System</h1>
-          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700" onClick={handleLogin}>
-            Sign in with Google
-          </button>
-        </div>
-      </div>
-    </>
-  )
+    <div>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <div className="w-screen text-center">
+              <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+                <h1 className="text-center">Hospital Management System</h1>
+                <button
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+                  onClick={handleLogin}
+                >
+                  Sign in with Google
+                </button>
+              </div>
+            </div>
+          }
+        />
+        <Route path="/profile" element={<ProfileWrapper />} />
+      </Routes>
+    </div>
+  );
 }
 
-export default App
+function ProfileWrapper() {
+  const location = useLocation();
+  const { name, authLevel } = location.state || {};
+
+  return <Profile PatientDetails={{ name, authLevel }} />;
+}
+
+function AppWrapper() {
+  return (
+    <Router>
+      <App />
+    </Router>
+  );
+}
+
+export default AppWrapper;

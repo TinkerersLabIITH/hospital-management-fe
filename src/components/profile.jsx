@@ -7,7 +7,9 @@ import AddIcon from "../assets/add.svg";
 import SearchIcon from "../assets/search.svg";
 import SortIcon from "../assets/sort.svg";
 
-function Profile(PatientDetails) {
+function Profile({ PatientDetails }) {
+  console.log(`Name: ${PatientDetails.name}`);
+  console.log(`authLevel: ${PatientDetails.authLevel}`);
   return (
     <div className="m-0 p-0 w-screen min-h-screen flex-col gap-y-16 overflow-x-hidden justify-center items-center">
       <div className="bg-gray-300 overflow-x-hidden mb-20">
@@ -33,7 +35,7 @@ function Profile(PatientDetails) {
             </div>
             <div className="profiledetails">
               <h1 className="text-5xl font-bold">
-                {PatientDetails.Name || "Captain Malhotra"}
+                {PatientDetails.name || "Captain Malhotra"}
               </h1>
               <table className="text-left mt-4">
                 <tr className="text-xl">
@@ -42,16 +44,16 @@ function Profile(PatientDetails) {
                 </tr>
                 <tr className="text-2xl font-medium">
                   <th className="gap-16">{PatientDetails.Age || "20 Years"}</th>
-                  <th>{PatientDetails.Sex || "Male"}</th>
+                  <th>{PatientDetails.sex || "Male"}</th>
                 </tr>
                 <tr className="text-xl">
                   <th className="font-normal">Relationship &nbsp;:</th>
-                  <th> &nbsp; {PatientDetails.Relationship || "Self"}</th>
+                  <th> &nbsp; {PatientDetails.relationship || "Self"}</th>
                 </tr>
                 <tr className="text-xl">
                   <th className="font-normal">Number &nbsp;:</th>
                   <th>
-                    &nbsp; {PatientDetails.ContactNumber || "00000 00000"}
+                    &nbsp; {PatientDetails.contactNumber || "00000 00000"}
                   </th>
                 </tr>
               </table>
@@ -79,7 +81,7 @@ function Profile(PatientDetails) {
                 <th className="font-normal">
                   Arm/Corp/Branch/Trade :{" "}
                   <span className="font-semibold">
-                    {PatientDetails.Arm || "Placeholder"}
+                    {PatientDetails.authLevel || "Placeholder"}
                   </span>
                 </th>
               </tr>
