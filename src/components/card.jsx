@@ -1,80 +1,76 @@
 import React from "react";
 import "../index.css";
 import Image from "../assets/th.jpeg";
-import Icon from "../assets/Icon.svg";
 
-function Card({ PatientDetails = {}}) {
-  return (
-    <div className="id bg-blue-200 rounded-2xl p-10">
-      <div className="box flex gap-2 ">
-        <div className="image mr-8 border-2 border-gray-400 rounded-2xl w-48 h-48">
-          <img
-            src={PatientDetails.img || Image}
-            className="w-48 h-48 rounded-2xl"
-          />
+function Card({ PatientDetails = {} }) {
+    return (
+        <div className="bg-blue-200 rounded-2xl p-4 sm:p-6 lg:p-8">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:gap-8">
+                <div className="flex-shrink-0">
+                    <div className="border-2 border-gray-400 rounded-2xl w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40">
+                        <img
+                            src={PatientDetails.img || Image}
+                            className="w-full h-full rounded-2xl object-cover"
+                            alt="Patient"
+                        />
+                    </div>
+                </div>
+                <div className="flex flex-col justify-between">
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">
+                        {PatientDetails.name || "Captain Malhotra"}
+                    </h1>
+                    <table className="text-left mt-2 sm:mt-4 lg:mt-6 text-sm sm:text-base lg:text-lg">
+                        <tbody>
+                            <tr>
+                                <th className="font-normal pr-4">Age : </th>
+                                <th className="font-medium pr-4">{PatientDetails.Age || "20 Years"}</th>
+                            </tr>
+                            <tr className="font-medium">
+                                <td className="pr-4 font-normal">Sex : </td>
+                                <td>{PatientDetails.sex || "Male"}</td>
+                            </tr>
+                            <tr>
+                                <td className="font-normal">Relationship :</td>
+                                <td>{PatientDetails.relationship || "Self"}</td>
+                            </tr>
+                            <tr>
+                                <td className="font-normal">Number :</td>
+                                <td>{PatientDetails.contactNumber || "00000 00000"}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div className="flex flex-col sm:flex-row justify-between items-center mt-4 sm:mt-6 lg:mt-8">
+                <table className="text-left text-sm sm:text-base lg:text-lg">
+                    <tbody>
+                        <tr>
+                            <td className="font-normal">
+                                Rank:{" "}
+                                <span className="font-semibold">
+                                    {PatientDetails.Rank || "Captain"}
+                                </span>{" "}
+                                <span className="ml-2 sm:ml-4 lg:ml-8">
+                                    Service:{" "}
+                                    <span className="font-semibold">
+                                        {PatientDetails.Service || "Air Force"}
+                                    </span>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td className="font-normal">
+                                Arm/Corp/Branch/Trade:{" "}
+                                <span className="font-semibold">
+                                    {PatientDetails.authLevel || "Placeholder"}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div className="profiledetails">
-          <h1 className="text-5xl font-bold">
-            {PatientDetails.name || "Captain Malhotra"}
-          </h1>
-          <table className="text-left mt-4">
-            <tbody>
-              <tr className="text-xl">
-                <th className="font-normal">Age</th>
-                <th className="font-normal">Sex</th>
-              </tr>
-              <tr className="text-2xl font-medium">
-                <td className="gap-16">{PatientDetails.Age || "20 Years"}</td>
-                <td>{PatientDetails.sex || "Male"}</td>
-              </tr>
-              <tr className="text-xl">
-                <td className="font-normal">Relationship :</td>
-                <td>{PatientDetails.relationship || "Self"}</td>
-              </tr>
-              <tr className="text-xl">
-                <td className="font-normal">Number :</td>
-                <td>{PatientDetails.contactNumber || "00000 00000"}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div className="flex justify-between items-center">
-        <table className="text-left mt-6 text-large">
-          <tbody>
-            <tr>
-              <td className="font-normal">
-                Rank :{" "}
-                <span className="font-semibold">
-                  {PatientDetails.Rank || "Captain"}
-                </span>{" "}
-                <span className="ml-16">
-                  Service :{" "}
-                  <span className="font-semibold">
-                    {PatientDetails.Service || "Air Force"}
-                  </span>
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <td className="font-normal">
-                Arm/Corp/Branch/Trade :{" "}
-                <span className="font-semibold">
-                  {PatientDetails.authLevel || "Placeholder"}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <button>
-          <img
-            src={Icon}
-            className="border-2 rounded-full p-1 mt-5 bg-blue-100 border-gray-400"
-          />
-        </button>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default Card;

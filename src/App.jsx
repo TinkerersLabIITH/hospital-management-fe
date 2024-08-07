@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { signInWithGoogle } from "./firebaseConfig";
 import FlagImage from "./assets/flag.jpg"
 import axios from "axios";
-import Profile from "./components/profile";
+import Profile from "./components/Pathology";
+import Priscription from "./components/Priscription";
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from "react-router-dom";
 
 function App() {
@@ -39,7 +40,7 @@ function App() {
         <Route
           path="/"
           element={
-            <div className="w-screen text-center flex w-screen h-screen justify-end items-start overflow-hidden bg-gray-400 bg-no-repeat bg-cover" style={{backgroundImage:`url(${FlagImage})`}}>
+            <div className="w-screen text-center flex w-screen h-screen justify-end items-start overflow-hidden bg-gray-400 bg-no-repeat bg-cover bg-center" style={{backgroundImage:`url(${FlagImage})`}}>
               <div className="bg-gray-200 p-8 rounded shadow-md w-full max-w-md m-10">
                 <h1 className="text-center">Hospital Management System</h1>
                 <button
@@ -53,6 +54,7 @@ function App() {
           }
         />
         <Route path="/profile" element={<ProfileWrapper />} />
+        <Route path="/priscription" element={<Priscription />} />
       </Routes>
     </div>
   );
