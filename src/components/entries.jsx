@@ -30,11 +30,11 @@ function Entries() {
               className="bg-gray-200 p-2 rounded-lg"
               alt="Filter"
             />
-            <div className="flex items-center gap-2 bg-gray-200 p-2 rounded-lg border-b-2 border-r-2 border-gray-300">
+            <div className="flex items-center gap-2 bg-gray-200 p-2 rounded-lg border-b-2 border-r-2 border-gray-300 flex-1">
               <img src={SearchIcon} alt="Search" />
               <input
                 type="text"
-                className="bg-gray-200 text-black border-none focus:outline-none"
+                className="bg-gray-200 text-black border-none focus:outline-none w-2/4"
                 placeholder="Search..."
               />
             </div>
