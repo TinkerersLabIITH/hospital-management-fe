@@ -64,7 +64,7 @@ function ProfileWrapper() {
   const location = useLocation();
   const { name, authLevel } = location.state || {};
 
-  return <Profile PatientDetails={{ name: name, authLevel: authLevel, img: "" }} />;
+  return <Profile Details={{ name: name, authLevel: authLevel, img: "" }} />;
 }
 
 function AppWrapper() {

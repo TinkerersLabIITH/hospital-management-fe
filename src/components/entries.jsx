@@ -4,7 +4,7 @@ import AddIcon from "../assets/add.svg";
 import SearchIcon from "../assets/search.svg";
 import AddEntry from "./addEntry";
 
-function Entries() {
+function Entries({ Details = {} }) {
   const [showAddEntry, setShowAddEntry] = useState(false);
   const [entries, setEntries] = useState([]);
 
@@ -39,13 +39,16 @@ function Entries() {
               />
             </div>
           </div>
-          <button
-            className="p-2 bg-indigo-800 text-white rounded-lg flex items-center gap-2"
-            onClick={toggleAddEntry}
-          >
-            <img src={AddIcon} alt="Add" />
-            <span className="hidden sm:inline-block">Add</span>
-          </button>
+
+          {Details.authlevel === "doctor" && (
+            <button
+              className="p-2 bg-indigo-800 text-white rounded-lg flex items-center gap-2"
+              onClick={toggleAddEntry}
+            >
+              <img src={AddIcon} alt="Add" />
+              <span className="hidden sm:inline-block">Add</span>
+            </button>
+          )}
         </div>
 
         {/* Conditionally render AddEntry form */}
