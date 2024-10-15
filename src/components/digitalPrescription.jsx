@@ -3,7 +3,7 @@ import Header from "./header";
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-function manualPrescription() {
+function DigitalPrescription() {
     const [prescriptions, setPrescriptions] = useState([]);
     const [newMedicine, setNewMedicine] = useState({
         medicineName: "",
@@ -271,4 +271,4 @@ function manualPrescription() {
     );
 }
 
-export default manualPrescription;
+export default DigitalPrescription;

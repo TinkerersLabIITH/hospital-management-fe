@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import jsPDF from 'jspdf';
 
-function PaperPrescription() {
+function ManualPrescription() {
     const canvasRef = useRef([]);
     const [drawing, setDrawing] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
@@ -157,4 +157,4 @@ function PaperPrescription() {
     );
 }
 
-export default PaperPrescription;
+export default ManualPrescription;

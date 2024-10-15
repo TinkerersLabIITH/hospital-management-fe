@@ -3,6 +3,7 @@ import FilterIcon from "../assets/filter.svg";
 import AddIcon from "../assets/add.svg";
 import SearchIcon from "../assets/search.svg";
 import AddEntry from "./addEntry";
+import prescriptionPDF from "../assets/prescription.pdf"
 import { useNavigate } from "react-router-dom"; // Updated import
 
 function Entries({ Details = {} }) {
@@ -91,7 +92,7 @@ function Entries({ Details = {} }) {
                 </td>
                 <td className="text-right p-2 md:p-4">
                   <a
-                    href="https://static.e-publishing.af.mil/production/1/jbmcguire-dix-lakehurst/publication/afi21-101_amcsup_jbmdlsup/afi21-101_amcsup_jbmdlsup.pdf"
+                    href={prescriptionPDF}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline"
@@ -118,7 +119,7 @@ function Entries({ Details = {} }) {
                   </td>
                   <td className="text-right p-2 md:p-4">
                     <a
-                      href={entry.property || "https://static.e-publishing.af.mil/production/1/jbmcguire-dix-lakehurst/publication/afi21-101_amcsup_jbmdlsup/afi21-101_amcsup_jbmdlsup.pdf"}
+                      href={entry.property || {prescriptionPDF}}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="underline"
