@@ -3,13 +3,16 @@ import FilterIcon from "../assets/filter.svg";
 import AddIcon from "../assets/add.svg";
 import SearchIcon from "../assets/search.svg";
 import AddEntry from "./addEntry";
+import { useNavigate } from "react-router-dom"; // Updated import
 
 function Entries({ Details = {} }) {
   const [showAddEntry, setShowAddEntry] = useState(false);
   const [entries, setEntries] = useState([]);
+  const navigate = useNavigate(); // Initialize the useNavigate hook
 
   const toggleAddEntry = () => {
-    setShowAddEntry(!showAddEntry);
+    // Navigate to /prescription page when the button is clicked
+    navigate('/prescription');
   };
 
   const handleAddEntry = (newEntry) => {
@@ -40,7 +43,7 @@ function Entries({ Details = {} }) {
             </div>
           </div>
 
-          {Details.authlevel === "doctor" && (
+          {Details.authLevel === "Doctor" && (
             <button
               className="p-2 bg-indigo-800 text-white rounded-lg flex items-center gap-2"
               onClick={toggleAddEntry}

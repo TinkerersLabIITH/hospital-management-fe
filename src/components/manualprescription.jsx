@@ -3,7 +3,7 @@ import Header from "./header";
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-function Prescription() {
+function manualPrescription() {
     const [prescriptions, setPrescriptions] = useState([]);
     const [newMedicine, setNewMedicine] = useState({
         medicineName: "",
@@ -93,7 +93,6 @@ function Prescription() {
 
     return (
         <div className="">
-            <Header Department={"Pharmacy"} />
             <div className="mb-4 w-full p-4 md:p-6">
                 {!isPrescriptionAdded ? (
                     <button
@@ -272,4 +271,4 @@ function Prescription() {
     );
 }
 
-export default Prescription;
+export default manualPrescription;

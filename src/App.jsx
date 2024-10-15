@@ -3,7 +3,7 @@ import { signInWithGoogle } from "./firebaseConfig";
 import FlagImage from "./assets/flag.jpg"
 import axios from "axios";
 import Profile from "./components/Pathology";
-import Priscription from "./components/Priscription";
+import Prescription from "./components/Prescription";
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation } from "react-router-dom";
 
 function App() {
@@ -54,7 +54,7 @@ function App() {
           }
         />
         <Route path="/profile" element={<ProfileWrapper />} />
-        <Route path="/priscription" element={<Priscription />} />
+        <Route path="/prescription" element={<Prescription />} />
       </Routes>
     </div>
   );
