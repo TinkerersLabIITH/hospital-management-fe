@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import Header from "./header";
+import Header from "../header";
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 

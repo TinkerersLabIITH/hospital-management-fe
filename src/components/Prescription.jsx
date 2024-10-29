@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import DigitalPrescription from "./digitalPrescription"; // Ensure this file exports the component correctly
-import ManualPrescription from "./manualPrescription"; // Create this component for paper prescriptions
+import DigitalPrescription from "./prescriptionTypes/digitalPrescription"; // Ensure this file exports the component correctly
+import ManualPrescription from "./prescriptionTypes/manualPrescription"; // Create this component for paper prescriptions
+import VoicePrescription from "./prescriptionTypes/voicePrescription";
 import Header from "./header";
 
 function Prescription() {
-    const [isDigital, setisDigital] = useState(true); // State to toggle between manual and paper prescriptions
+    const [prescriptionType, setPrescriptionType] = useState("digital"); // State to track selected prescription type
 
-    const handleToggle = (option) => {
-        setisDigital(option === 'manual');
+    const handleToggle = (type) => {
+        setPrescriptionType(type);
     };
 
     return (
@@ -16,24 +17,28 @@ function Prescription() {
             <div className="mb-4 w-full p-4 md:p-6">
                 <h2 className="text-xl font-semibold mb-2">Select Prescription Type</h2>
                 <button
-                    onClick={() => handleToggle('manual')}
-                    className={`p-2 ${isDigital ? 'bg-blue-600' : 'bg-gray-400'} text-white rounded-lg mr-2`}
+                    onClick={() => handleToggle("digital")}
+                    className={`p-2 ${prescriptionType === "digital" ? "bg-blue-600" : "bg-gray-400"} text-white rounded-lg mr-2`}
                 >
                     Digital Prescription
                 </button>
                 <button
-                    onClick={() => handleToggle('paper')}
-                    className={`p-2 ${!isDigital ? 'bg-blue-600' : 'bg-gray-400'} text-white rounded-lg`}
+                    onClick={() => handleToggle("manual")}
+                    className={`p-2 ${prescriptionType === "manual" ? "bg-blue-600" : "bg-gray-400"} text-white rounded-lg mr-2`}
                 >
                     Manual Prescription
                 </button>
+                <button
+                    onClick={() => handleToggle("voice")}
+                    className={`p-2 ${prescriptionType === "voice" ? "bg-blue-600" : "bg-gray-400"} text-white rounded-lg`}
+                >
+                    Voice Prescription
+                </button>
             </div>
 
-            {isDigital ? (
-                <DigitalPrescription />
-            ) : (
-                <ManualPrescription /> // Render the PaperPrescription component here
-            )}
+            {prescriptionType === "digital" && <DigitalPrescription />}
+            {prescriptionType === "manual" && <ManualPrescription />}
+            {prescriptionType === "voice" && <VoicePrescription />}
         </div>
     );
 }
