@@ -1,73 +1,79 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import jsPDF from "jspdf";
 
 function VoicePrescription() {
     const [isRecording, setIsRecording] = useState(false);
     const [transcript, setTranscript] = useState("");
-    const [timeoutId, setTimeoutId] = useState(null);
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+    const [mediaRecorder, setMediaRecorder] = useState(null);
+    const audioChunksRef = useRef([]);
 
     useEffect(() => {
-        if (recognition) {
-            recognition.lang = "en-US"; // Set language
-
-            recognition.onresult = (event) => {
-                const speechToText = event.results[0][0].transcript;
-                setTranscript((prevTranscript) => prevTranscript + " " + speechToText);
-
-                resetTimeout();
-            };
-
-            recognition.onerror = (event) => {
-                console.error("Speech Recognition Error:", event.error);
-                stopRecording();
-            };
-
-            recognition.onend = () => {
-                if (isRecording) {
-                    setTimeout(() => {
-                        recognition.start();
-                    }, 1000);
-                }
-            };
+        if (isRecording && mediaRecorder) {
+            mediaRecorder.start();
         }
 
-        return () => clearTimeout(timeoutId);
-    }, [recognition, timeoutId, isRecording]);
-
-    const resetTimeout = () => {
-        if (timeoutId) {
-            clearTimeout(timeoutId);
+        if (!isRecording && mediaRecorder) {
+            mediaRecorder.stop();
         }
+    }, [isRecording, mediaRecorder]);
 
-        const newTimeoutId = setTimeout(() => {
-            stopRecording();
-        }, 1000);
+    useEffect(() => {
+        const initMediaRecorder = async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const recorder = new MediaRecorder(stream);
 
-        setTimeoutId(newTimeoutId);
-    };
+                recorder.ondataavailable = (event) => {
+                    // Append new chunks to the ref (avoid state update issues)
+                    audioChunksRef.current.push(event.data);
+                };
 
-    const stopRecording = () => {
-        setIsRecording(false);
-        if (recognition) {
-            recognition.stop();
+                recorder.onstop = async () => {
+                    // Create the audioBlob from collected chunks
+                    const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+
+                    // Check if the audioBlob is empty before sending it
+                    if (audioBlob.size === 0) {
+                        console.error("Audio Blob is empty, not sending to server.");
+                        return;
+                    }
+
+                    // Reset audioChunksRef
+                    audioChunksRef.current = [];
+                    await processAudio(audioBlob);
+                };
+
+                setMediaRecorder(recorder);
+            } catch (err) {
+                console.error("Error accessing microphone:", err);
+            }
+        };
+
+        initMediaRecorder();
+    }, []);
+
+    const processAudio = async (audioBlob) => {
+        const formData = new FormData();
+        formData.append("audio", audioBlob);
+
+        try {
+            const response = await fetch(import.meta.env.VITE_SERVER_URI + "/api/audio", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (data.transcript) {
+                setTranscript((prevTranscript) => prevTranscript + " " + data.transcript);
+            }
+        } catch (error) {
+            console.error("Error processing audio:", error);
         }
     };
 
     const handleVoiceInput = () => {
-        if (!recognition) {
-            alert("Speech Recognition API not supported in this browser.");
-            return;
-        }
-
-        if (!isRecording) {
-            setIsRecording(true);
-            recognition.start();
-        } else {
-            stopRecording();
-        }
+        setIsRecording((prev) => !prev);
     };
 
     const handleClearText = () => {
@@ -109,7 +115,7 @@ function VoicePrescription() {
                     className="w-full border rounded-lg p-2 text-gray-700"
                     rows="6"
                     value={transcript}
-                    onChange={(e) => setTranscript(e.target.value)} // Allow manual editing
+                    onChange={(e) => setTranscript(e.target.value)}
                     placeholder="Your prescription text will appear here..."
                 />
             </div>
