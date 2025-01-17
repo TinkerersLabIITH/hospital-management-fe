@@ -3,8 +3,11 @@ import DigitalPrescription from "./prescriptionTypes/digitalPrescription"; // En
 import ManualPrescription from "./prescriptionTypes/manualPrescription"; // Create this component for paper prescriptions
 import VoicePrescription from "./prescriptionTypes/voicePrescription";
 import Header from "./header";
+import { useLocation } from "react-router-dom";
 
 function Prescription() {
+    const location = useLocation();
+    const details = location.state
     const [prescriptionType, setPrescriptionType] = useState("digital"); // State to track selected prescription type
 
     const handleToggle = (type) => {
@@ -36,9 +39,9 @@ function Prescription() {
                 </button>
             </div>
 
-            {prescriptionType === "digital" && <DigitalPrescription />}
-            {prescriptionType === "manual" && <ManualPrescription />}
-            {prescriptionType === "voice" && <VoicePrescription />}
+            {prescriptionType === "digital" && <DigitalPrescription Details={details}/>}
+            {prescriptionType === "manual" && <ManualPrescription Details={details}/>}
+            {prescriptionType === "voice" && <VoicePrescription Details={details}/>}
         </div>
     );
 }

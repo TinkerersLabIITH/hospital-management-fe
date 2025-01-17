@@ -16,7 +16,9 @@ function Entries({ Details = {} }) {
   const navigate = useNavigate();
 
   const toggleAddEntry = () => {
-    navigate("/prescription");
+    navigate("/prescription",{
+      state: Details
+    });
   };
 
   const handleAddEntry = async (newEntry) => {
@@ -117,7 +119,7 @@ function Entries({ Details = {} }) {
             </div>
           </div>
 
-          {Details.authLevel === "Doctor" && (
+          {(
             <button
               className="p-2 bg-indigo-800 text-white rounded-lg flex items-center gap-2"
               onClick={toggleAddEntry}
@@ -141,21 +143,23 @@ function Entries({ Details = {} }) {
                 <th>#</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th>Status</th>
+                <th>Date</th>
                 <th className="text-right">Property</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="text-sm md:text-normal bg-gray-100">
-                <td className="p-2 md:p-4">0</td>
-                <td>Test Name</td>
+  
+              {Details.medicalHistory && Details.medicalHistory.map((entry, index) => (
+                <tr key={index} className="text-sm md:text-normal bg-gray-100">
+                <td className="p-2 md:p-4">{index+1}</td>
+                <td>{Details.doctorName}</td>
                 <td>
                   Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste,
                   sunt.
                 </td>
                 <td>
                   <span className="p-2 pl-4 pr-4 bg-gray-400 text-black text-center rounded-3xl mt-2">
-                    Resolved
+                    {Details.prescribedDate}
                   </span>
                 </td>
                 <td className="text-right p-2 md:p-4">
@@ -180,43 +184,6 @@ function Entries({ Details = {} }) {
                   )}
                 </td>
               </tr>
-              {entries.map((entry, index) => (
-                <tr key={index} className="text-sm md:text-normal bg-gray-100">
-                  <td className="p-2 md:p-4">{index + 1}</td>
-                  <td>{entry.name}</td>
-                  <td>{entry.description}</td>
-                  <td>
-                    <span
-                      className={`p-2 pl-4 pr-4 text-center rounded-3xl mt-2 ${
-                        entry.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-gray-400 text-black"
-                      }`}
-                    >
-                      {entry.status}
-                    </span>
-                  </td>
-                  <td className="text-right p-2 md:p-4">
-                    <a
-                      onClick={toggleDropdown}
-                      className="underline cursor-pointer"
-                    >
-                      View PDF
-                    </a>
-                    {showDropdown && (
-                      <div className="mt-2">
-                        <select
-                          className="bg-gray-200 p-2 rounded-lg"
-                          onClick={handleLanguageChange}
-                          value={selectedLanguage}
-                        >
-                          <option value="en">English</option>
-                          <option value="hi">Hindi</option>
-                        </select>
-                      </div>
-                    )}
-                  </td>
-                </tr>
               ))}
             </tbody>
           </table>

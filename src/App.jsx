@@ -63,8 +63,8 @@ function App() {
 function ProfileWrapper() {
   const location = useLocation();
   const { name, authLevel } = location.state || {};
-
-  return <Profile Details={{ name: name, authLevel: "Doctor", img: "" }} />;
+  console.log("NAME",name)
+  return <Profile Details={{ doctorName: name, authLevel: "Doctor", img: "" }} />;
 }
 
 function AppWrapper() {

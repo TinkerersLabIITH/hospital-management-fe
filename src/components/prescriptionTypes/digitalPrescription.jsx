@@ -3,7 +3,7 @@ import Header from "../header";
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-function DigitalPrescription() {
+function DigitalPrescription({ Details = {} }) {
     const [prescriptions, setPrescriptions] = useState([]);
     const [newMedicine, setNewMedicine] = useState({
         medicineName: "",
@@ -54,7 +54,7 @@ function DigitalPrescription() {
         setCurrentPrescription(updatedPrescription);
     };
 
-    const generatePDF = (index) => {
+    const generatePDF = async (index) => {
         const prescription = prescriptions[index];
         const doc = new jsPDF('p', 'mm', 'a4');
 
@@ -88,7 +88,33 @@ function DigitalPrescription() {
             columnStyles: { 0: { cellWidth: 30 } } // Adjust column width if necessary
         });
 
-        doc.save(`prescription-${index + 1}.pdf`);
+        const pdfBlob = doc.output('blob');
+
+        // Create FormData to upload PDF
+        const formData = new FormData();
+        const date = new Date().toISOString();
+        formData.append("prescriptionFile", pdfBlob, `prescription-${date}-${Details.rfID}.pdf`);
+        formData.append("doctorName", Details.doctorName);
+        formData.append("prescribedDate", date);
+
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_SERVER_URI}/api/prescriptions/${Details.rfidCardId}`,
+                {
+                    method: "POST",
+                    body: formData,
+                }
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Prescription uploaded successfully:", data);
+            } else {
+                console.error("Failed to upload prescription:", await response.json());
+            }
+        } catch (error) {
+            console.error("Error uploading prescription:", error);
+        }
     };
 
     return (

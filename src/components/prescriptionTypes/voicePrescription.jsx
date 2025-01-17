@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import jsPDF from "jspdf";
 
-function VoicePrescription() {
+function VoicePrescription({ Details = {} }) {
     const [isRecording, setIsRecording] = useState(false);
     const [transcript, setTranscript] = useState("");
     const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -80,13 +80,41 @@ function VoicePrescription() {
         setTranscript("");
     };
 
-    const handleGeneratePDF = () => {
+    const handleGeneratePDF = async () => {
         const doc = new jsPDF();
         doc.setFontSize(12);
         doc.text("Prescription", 10, 10);
         doc.text(transcript || "No prescription text provided.", 10, 20);
-        doc.save("prescription.pdf");
-    };
+    
+        // Generate PDF Blob
+        const pdfBlob = doc.output("blob");
+    
+        // Create FormData to upload PDF
+        const formData = new FormData();
+        const date = new Date().toISOString();
+        formData.append("prescriptionFile", pdfBlob, `prescription-${date}-${Details.rfidCardId}.pdf`);
+        formData.append("doctorName", Details.doctorName);
+        formData.append("prescribedDate", date);
+    
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_SERVER_URI}/api/prescriptions/${Details.rfidCardId}`,
+                {
+                    method: "POST",
+                    body: formData,
+                }
+            );
+    
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Prescription uploaded successfully:", data);
+            } else {
+                console.error("Failed to upload prescription:", await response.json());
+            }
+        } catch (error) {
+            console.error("Error uploading prescription:", error);
+        }
+    };    
 
     return (
         <div className="p-4">

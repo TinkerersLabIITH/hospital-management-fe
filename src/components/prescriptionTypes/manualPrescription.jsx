@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import jsPDF from "jspdf";
 import Tesseract from "tesseract.js";
 
-function ManualPrescription() {
+function ManualPrescription({ Details = {} }) {
     const canvasRef = useRef([]);
     const [drawing, setDrawing] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
@@ -74,7 +74,7 @@ function ManualPrescription() {
         }
     };
 
-    const downloadPDF = () => {
+    const downloadPDF = async() => {
         if (!extractedText.trim()) {
             alert("No extracted text available for PDF!");
             return;
@@ -87,8 +87,34 @@ function ManualPrescription() {
         pdf.text("Prescription", 10, 10);
         pdf.text(extractedText.trim(), 10, 20);
 
-        // Save the PDF
-        pdf.save("prescription.pdf");
+        // Convert PDF to Blob
+        const pdfBlob = pdf.output("blob");
+
+        // Create FormData to upload PDF
+        const formData = new FormData();
+        const date = new Date().toISOString();
+        formData.append("prescriptionFile", pdfBlob, `prescription-${date}-${Details.rfID}.pdf`);
+        formData.append("doctorName", Details.doctorName);
+        formData.append("prescribedDate", date);
+
+        try {
+            const response = await fetch(
+            `${import.meta.env.VITE_SERVER_URI}/api/prescriptions/${Details.rfidCardId}`,
+            {
+                method: "POST",
+                body: formData,
+            }
+            );
+
+            if (response.ok) {
+            const data = await response.json();
+            console.log("Prescription uploaded successfully:", data);
+            } else {
+            console.error("Failed to upload prescription:", await response.json());
+            }
+        } catch (error) {
+            console.error("Error uploading prescription:", error);
+        }
     };
 
     const clearCanvas = () => {

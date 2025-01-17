@@ -17,17 +17,17 @@ function Card({ Details = {} }) {
                 </div>
                 <div className="flex flex-col justify-between">
                     <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">
-                        {Details.name || "Captain Malhotra"}
+                        {Details.name || "Patient"}
                     </h1>
                     <table className="text-left mt-2 sm:mt-4 lg:mt-6 text-sm sm:text-base lg:text-lg">
                         <tbody>
                             <tr>
                                 <th className="font-normal pr-4">Age : </th>
-                                <th className="font-medium pr-4">{Details.Age || "20 Years"}</th>
+                                <th className="font-medium pr-4">{(Details.age && `${Details.age} Years`) || "--"}</th>
                             </tr>
                             <tr className="font-medium">
                                 <td className="pr-4 font-normal">Sex : </td>
-                                <td>{Details.sex || "Male"}</td>
+                                <td>{Details.sex || "--"}</td>
                             </tr>
                             <tr>
                                 <td className="font-normal">Relationship :</td>
@@ -35,7 +35,7 @@ function Card({ Details = {} }) {
                             </tr>
                             <tr>
                                 <td className="font-normal">Number :</td>
-                                <td>{Details.contactNumber || "00000 00000"}</td>
+                                <td>{Details.contact || "----- -----"}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -48,12 +48,12 @@ function Card({ Details = {} }) {
                             <td className="font-normal">
                                 Rank:{" "}
                                 <span className="font-semibold">
-                                    {Details.Rank || "Captain"}
+                                    {Details.rank || "--"}
                                 </span>{" "}
                                 <span className="ml-2 sm:ml-4 lg:ml-8">
                                     Service:{" "}
                                     <span className="font-semibold">
-                                        {Details.Service || "Air Force"}
+                                        {Details.service || "Air Force"}
                                     </span>
                                 </span>
                             </td>
@@ -62,7 +62,7 @@ function Card({ Details = {} }) {
                             <td className="font-normal">
                                 Arm/Corp/Branch/Trade:{" "}
                                 <span className="font-semibold">
-                                    {Details.authLevel || "Placeholder"}
+                                    {"Patient"}
                                 </span>
                             </td>
                         </tr>
