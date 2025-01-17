@@ -3,22 +3,95 @@ import FilterIcon from "../assets/filter.svg";
 import AddIcon from "../assets/add.svg";
 import SearchIcon from "../assets/search.svg";
 import AddEntry from "./addEntry";
-import prescriptionPDF from "../assets/prescription.pdf"
-import { useNavigate } from "react-router-dom"; // Updated import
+import prescriptionPDF from "../assets/prescription.pdf";
+import { useNavigate } from "react-router-dom";
+import * as pdfjsLib from 'pdfjs-dist';
+pdfjsLib.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 
 function Entries({ Details = {} }) {
   const [showAddEntry, setShowAddEntry] = useState(false);
   const [entries, setEntries] = useState([]);
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [showDropdown, setShowDropdown] = useState(false); // State to toggle dropdown
+  const navigate = useNavigate();
 
   const toggleAddEntry = () => {
-    // Navigate to /prescription page when the button is clicked
-    navigate('/prescription');
+    navigate("/prescription");
   };
 
-  const handleAddEntry = (newEntry) => {
+  const handleAddEntry = async (newEntry) => {
     setEntries((prevEntries) => [...prevEntries, newEntry]);
-    setShowAddEntry(false); // Hide the form after adding the entry
+    setShowAddEntry(false);
+  };
+
+  const extractTextFromPDF = async (pdfUrl) => {
+    try {
+      const loadingTask = pdfjsLib.getDocument(pdfUrl);
+      const pdf = await loadingTask.promise;
+      const totalPageCount = pdf.numPages;
+      const countPromises = [];
+
+      for (let currentPage = 1; currentPage <= totalPageCount; currentPage++) {
+        const page = await pdf.getPage(currentPage);
+        countPromises.push(
+          page.getTextContent().then((textContent) => {
+            return textContent.items.map((item) => item.str).join(' ');  // Join text content items into a single string
+          })
+        );
+      }
+
+      // Wait for all promises to resolve and return the concatenated text
+      const texts = await Promise.all(countPromises);
+      return texts.join('');
+    } catch (error) {
+      console.error('Error extracting text from PDF:', error);
+      return '';
+    }
+  };
+  
+  const translateText = async (text, targetLanguage) => {
+    try {
+      const response = await fetch(import.meta.env.VITE_SERVER_URI+'/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, targetLanguage })
+      });
+      
+      const data = await response.json();
+      return data.translatedText;
+    } catch (error) {
+      console.error('Error translating text:', error);
+      return 'Translation failed';
+    }
+  };
+
+  const handleLanguageChange = async (event) => {
+    const language = event.target.value;
+    setSelectedLanguage(language);
+  
+    try {
+      // Extract text from the PDF
+      const extractedText = await extractTextFromPDF(prescriptionPDF);
+  
+      // Translate the extracted text
+      const translatedText = await translateText(extractedText, language);
+  
+      // Create a downloadable plain text file
+      const textBlob = new Blob([translatedText], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(textBlob);
+      link.download = `prescription-${language}.txt`;
+      link.click();
+  
+      // Cleanup URL object to prevent memory leaks
+      URL.revokeObjectURL(link.href);
+    } catch (error) {
+      console.error("Error translating or generating text file:", error);
+    }
+  };    
+  
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown); // Toggle dropdown visibility
   };
 
   return (
@@ -55,7 +128,6 @@ function Entries({ Details = {} }) {
           )}
         </div>
 
-        {/* Conditionally render AddEntry form */}
         {showAddEntry && (
           <div className="mt-4">
             <AddEntry onAdd={handleAddEntry} />
@@ -66,16 +138,10 @@ function Entries({ Details = {} }) {
           <table className="text-left w-full mt-2">
             <thead>
               <tr className="text-xs md:text-sm justify-between gap-4 p-2">
-                <th>
-                  <div className="flex items-center md:gap-2">#</div>
-                </th>
-                <th>
-                  <div className="flex items-center md:gap-2">Name</div>
-                </th>
+                <th>#</th>
+                <th>Name</th>
                 <th>Description</th>
-                <th>
-                  <div className="flex items-center md:gap-2">Status</div>
-                </th>
+                <th>Status</th>
                 <th className="text-right">Property</th>
               </tr>
             </thead>
@@ -83,29 +149,42 @@ function Entries({ Details = {} }) {
               <tr className="text-sm md:text-normal bg-gray-100">
                 <td className="p-2 md:p-4">0</td>
                 <td>Test Name</td>
-                <td className="flex-1">
+                <td>
                   Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste,
                   sunt.
                 </td>
-                <td className="flex justify-start items-center">
-                  <span className="p-2 pl-4 pr-4 bg-gray-400 text-black text-center rounded-3xl mt-2">Resolved</span>
+                <td>
+                  <span className="p-2 pl-4 pr-4 bg-gray-400 text-black text-center rounded-3xl mt-2">
+                    Resolved
+                  </span>
                 </td>
                 <td className="text-right p-2 md:p-4">
                   <a
-                    href={prescriptionPDF}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
+                    onClick={toggleDropdown}
+                    className="underline cursor-pointer"
                   >
-                    PDF
+                    View PDF
                   </a>
+                  {showDropdown && (
+                    <div className="mt-2">
+                      <select
+                        className="bg-gray-200 p-2 rounded-lg"
+                        onChange={handleLanguageChange}
+                        value={selectedLanguage}
+                      >
+                        <option value="en">English</option>
+                        <option value="hi">Hindi</option>
+                        <option value="te">Telugu</option>
+                      </select>
+                    </div>
+                  )}
                 </td>
               </tr>
               {entries.map((entry, index) => (
                 <tr key={index} className="text-sm md:text-normal bg-gray-100">
                   <td className="p-2 md:p-4">{index + 1}</td>
                   <td>{entry.name}</td>
-                  <td className="flex-1">{entry.description}</td>
+                  <td>{entry.description}</td>
                   <td>
                     <span
                       className={`p-2 pl-4 pr-4 text-center rounded-3xl mt-2 ${
@@ -119,13 +198,23 @@ function Entries({ Details = {} }) {
                   </td>
                   <td className="text-right p-2 md:p-4">
                     <a
-                      href={entry.property || {prescriptionPDF}}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline"
+                      onClick={toggleDropdown}
+                      className="underline cursor-pointer"
                     >
-                      PDF
+                      View PDF
                     </a>
+                    {showDropdown && (
+                      <div className="mt-2">
+                        <select
+                          className="bg-gray-200 p-2 rounded-lg"
+                          onClick={handleLanguageChange}
+                          value={selectedLanguage}
+                        >
+                          <option value="en">English</option>
+                          <option value="hi">Hindi</option>
+                        </select>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
