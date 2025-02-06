@@ -83,6 +83,12 @@ function VoicePrescription({ Details = {} }) {
     const handleGeneratePDF = async () => {
         const doc = new jsPDF();
         doc.setFontSize(12);
+
+        if (!transcript.trim()) {
+            alert("No text to save!");
+            return;
+        }
+
         doc.text("Prescription", 10, 10);
         doc.text(transcript || "No prescription text provided.", 10, 20);
     

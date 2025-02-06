@@ -1,199 +1,147 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import Tesseract from "tesseract.js";
+import SignaturePad from "signature_pad";
 
 function ManualPrescription({ Details = {} }) {
+    const linesPerPage = 10;
     const canvasRef = useRef([]);
-    const [drawing, setDrawing] = useState(false);
+    const signaturePadRef = useRef([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [pages, setPages] = useState([true]);
     const [extractedText, setExtractedText] = useState("");
+    const [isProcessing, setIsProcessing] = useState(false);
 
-    const startDrawing = (e) => {
-        const canvas = canvasRef.current[currentPage];
-        if (!canvas) return;
+    useEffect(() => {
+        const initializeSignaturePad = (canvas) => {
+            return new SignaturePad(canvas, {
+                minWidth: 1.9,
+                maxWidth: 1.9,
+                penColor: '#000000',
+                backgroundColor: '#FFFFFF',
+                throttle: 16
+            });
+        };
 
-        const ctx = canvas.getContext("2d");
-        ctx.beginPath();
-
-        const { offsetX, offsetY } = e.nativeEvent.type === "touchstart"
-            ? e.nativeEvent.touches[0]
-            : e.nativeEvent;
-
-        ctx.moveTo(offsetX, offsetY);
-        setDrawing(true);
-
-        setPages((prev) => {
-            const newPages = [...prev];
-            newPages[currentPage] = false;
-            return newPages;
+        canvasRef.current.forEach((canvas, index) => {
+            if (canvas && !signaturePadRef.current[index]) {
+                signaturePadRef.current[index] = initializeSignaturePad(canvas);
+            }
         });
-    };
-
-    const draw = (e) => {
-        if (!drawing) return;
-
-        const canvas = canvasRef.current[currentPage];
-        const ctx = canvas.getContext("2d");
-        ctx.lineWidth = 2;
-        ctx.lineCap = "round";
-        ctx.strokeStyle = "#000";
-
-        const { offsetX, offsetY } = e.nativeEvent.type === "touchmove"
-            ? e.nativeEvent.touches[0]
-            : e.nativeEvent;
-
-        ctx.lineTo(offsetX, offsetY);
-        ctx.stroke();
-    };
-
-    const stopDrawing = () => {
-        const canvas = canvasRef.current[currentPage];
-        if (!canvas) return;
-
-        const ctx = canvas.getContext("2d");
-        ctx.closePath();
-        setDrawing(false);
-    };
+    }, [pages]);
 
     const extractTextFromCanvas = async () => {
-        const canvas = canvasRef.current[currentPage];
-        if (!canvas || pages[currentPage]) {
-            alert("Canvas is empty or no drawing found!");
+        setIsProcessing(true);
+        let images = [];
+
+        for (let i = 0; i < linesPerPage; i++) {
+            const canvas = canvasRef.current[i + currentPage * linesPerPage];
+            if (!canvas || signaturePadRef.current[i + currentPage * linesPerPage]?.isEmpty()) continue;
+            images.push(canvas.toDataURL("image/png"));
+        }
+
+        if (images.length === 0) {
+            alert("No text to process!");
+            setIsProcessing(false);
             return;
         }
 
         try {
-            const dataUrl = canvas.toDataURL("image/png");
-            const { data: { text } } = await Tesseract.recognize(dataUrl, "eng");
-
-            setExtractedText((prevText) => prevText + "\n" + text.trim());
+            console.log("Length",images.length)
+            const response = await fetch(`${import.meta.env.VITE_PYTHON_SERVER_URI}/api/ocr`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ images })
+            });
+            const result = await response.json();
+            setExtractedText(prev => `${prev}\n${result.text}`);
         } catch (error) {
-            console.error("Error extracting text:", error);
-            alert("Failed to extract text from the canvas.");
+            console.error("OCR Error:", error);
+            alert("Text extraction failed. Please try again.");
+        } finally {
+            setIsProcessing(false);
         }
     };
 
-    const downloadPDF = async() => {
+    const handleGeneratePDF = async () => {
+        const doc = new jsPDF();
+        doc.setFontSize(12);
+
         if (!extractedText.trim()) {
-            alert("No extracted text available for PDF!");
+            alert("No text to save!");
             return;
         }
 
-        const pdf = new jsPDF();
-        pdf.setFontSize(12);
-
-        // Add extracted text to the PDF
-        pdf.text("Prescription", 10, 10);
-        pdf.text(extractedText.trim(), 10, 20);
-
-        // Convert PDF to Blob
-        const pdfBlob = pdf.output("blob");
-
+        doc.text("Prescription", 10, 10);
+        doc.text(extractedText || "No prescription text provided.", 10, 20);
+    
+        // Generate PDF Blob
+        const pdfBlob = doc.output("blob");
+    
         // Create FormData to upload PDF
         const formData = new FormData();
         const date = new Date().toISOString();
-        formData.append("prescriptionFile", pdfBlob, `prescription-${date}-${Details.rfID}.pdf`);
+        formData.append("prescriptionFile", pdfBlob, `prescription-${date}-${Details.rfidCardId}.pdf`);
         formData.append("doctorName", Details.doctorName);
         formData.append("prescribedDate", date);
-
+    
         try {
             const response = await fetch(
-            `${import.meta.env.VITE_SERVER_URI}/api/prescriptions/${Details.rfidCardId}`,
-            {
-                method: "POST",
-                body: formData,
-            }
+                `${import.meta.env.VITE_SERVER_URI}/api/prescriptions/${Details.rfidCardId}`,
+                {
+                    method: "POST",
+                    body: formData,
+                }
             );
-
+    
             if (response.ok) {
-            const data = await response.json();
-            console.log("Prescription uploaded successfully:", data);
+                const data = await response.json();
+                console.log("Prescription uploaded successfully:", data);
             } else {
-            console.error("Failed to upload prescription:", await response.json());
+                console.error("Failed to upload prescription:", await response.json());
             }
         } catch (error) {
             console.error("Error uploading prescription:", error);
         }
-    };
+    };  
 
     const clearCanvas = () => {
-        const canvas = canvasRef.current[currentPage];
-        const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the current canvas
-        setPages((prev) => {
-            const newPages = [...prev];
-            newPages[currentPage] = true; // Mark current page as empty
-            return newPages;
-        });
-    };
-
-    const clearAllPages = () => {
-        canvasRef.current.forEach((canvas) => {
-            const ctx = canvas.getContext("2d");
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear each canvas
-        });
-        setPages(pages.map(() => true)); // Mark all pages as empty
-        setCurrentPage(0); // Reset to the first page
-        setExtractedText(""); // Clear extracted text
+        for (let i = 0; i < linesPerPage; i++) {
+            signaturePadRef.current[i + currentPage * linesPerPage]?.clear();
+        }
     };
 
     const addPage = () => {
-        setPages((prev) => [...prev, true]); // Add a new page and mark it as empty
-        setCurrentPage((prev) => prev + 1); // Move to the new page
+        setPages(prev => [...prev, true]);
+        setCurrentPage(prev => prev + 1);
     };
 
     return (
         <div className="p-4">
             <h2 className="text-xl font-semibold mb-4">Write Prescription</h2>
             <div className="overflow-auto">
-                {pages.map((_, index) => (
+                {[...Array(linesPerPage)].map((_, index) => (
                     <canvas
-                        key={index}
-                        ref={(el) => (canvasRef.current[index] = el)}
-                        onMouseDown={startDrawing}
-                        onMouseMove={draw}
-                        onMouseUp={stopDrawing}
-                        onMouseLeave={stopDrawing}
-                        onTouchStart={startDrawing} // Handle touch start
-                        onTouchMove={draw} // Handle touch move
-                        onTouchEnd={stopDrawing} // Handle touch end
-                        onTouchCancel={stopDrawing} // Handle touch cancel
-                        width={600}
-                        height={400}
-                        className={`border border-gray-300 mb-4 ${index !== currentPage ? "hidden" : ""}`}
+                        key={index + currentPage * linesPerPage}
+                        ref={(el) => (canvasRef.current[index + currentPage * linesPerPage] = el)}
+                        width={window.innerWidth * 0.9}
+                        height={250}
+                        className="border border-gray-300 mb-2 bg-white"
                     />
                 ))}
             </div>
-            <div className="flex space-x-2 mb-4">
-                <button
-                    onClick={extractTextFromCanvas}
-                    className="p-2 bg-blue-600 text-white rounded-lg"
-                >
-                    Extract Text
+            
+            <div className="flex flex-wrap gap-2 mb-4">
+                <button onClick={extractTextFromCanvas} disabled={isProcessing} className="p-2 bg-blue-600 text-white rounded-lg">
+                    {isProcessing ? "Processing..." : "Extract Text"}
                 </button>
-                <button
-                    onClick={downloadPDF}
-                    className="p-2 bg-green-600 text-white rounded-lg"
-                >
-                    Download PDF
+                <button onClick={handleGeneratePDF} className="p-2 bg-green-600 text-white rounded-lg">
+                    Generate PDF
                 </button>
-                <button
-                    onClick={clearCanvas}
-                    className="p-2 bg-red-600 text-white rounded-lg"
-                >
+                <button onClick={clearCanvas} className="p-2 bg-red-600 text-white rounded-lg">
                     Clear Page
                 </button>
-                <button
-                    onClick={clearAllPages}
-                    className="p-2 bg-orange-600 text-white rounded-lg"
-                >
-                    Clear All
-                </button>
-                <button
-                    onClick={addPage}
-                    className="p-2 bg-purple-600 text-white rounded-lg"
-                >
+                <button onClick={addPage} className="p-2 bg-purple-600 text-white rounded-lg">
                     Add Next Page
                 </button>
             </div>

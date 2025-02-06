@@ -33,6 +33,7 @@
     "react-speech-to-text": "^1.1.1",
     "regenerator-runtime": "^0.14.1",
     "rimraf": "^6.0.1",
+    "signature_pad": "^5.0.4",
     "speech-to-text": "^2.9.1",
     "tailwind": "^4.0.0",
     "tailwind-merge": "^2.4.0",
