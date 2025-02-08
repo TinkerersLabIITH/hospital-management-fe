@@ -3,7 +3,6 @@ import FilterIcon from "../assets/filter.svg";
 import AddIcon from "../assets/add.svg";
 import SearchIcon from "../assets/search.svg";
 import AddEntry from "./addEntry";
-import prescriptionPDF from "../assets/prescription.pdf";
 import { useNavigate } from "react-router-dom";
 import * as pdfjsLib from 'pdfjs-dist';
 pdfjsLib.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
@@ -11,12 +10,10 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 function Entries({ Details = {} }) {
   const [showAddEntry, setShowAddEntry] = useState(false);
   const [entries, setEntries] = useState([]);
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
-  const [showDropdown, setShowDropdown] = useState(false); // State to toggle dropdown
   const navigate = useNavigate();
 
   const toggleAddEntry = () => {
-    navigate("/prescription",{
+    navigate("/prescription", {
       state: Details
     });
   };
@@ -26,74 +23,31 @@ function Entries({ Details = {} }) {
     setShowAddEntry(false);
   };
 
-  const extractTextFromPDF = async (pdfUrl) => {
+  const viewPDF = async (filePath) => {
     try {
-      const loadingTask = pdfjsLib.getDocument(pdfUrl);
-      const pdf = await loadingTask.promise;
-      const totalPageCount = pdf.numPages;
-      const countPromises = [];
-
-      for (let currentPage = 1; currentPage <= totalPageCount; currentPage++) {
-        const page = await pdf.getPage(currentPage);
-        countPromises.push(
-          page.getTextContent().then((textContent) => {
-            return textContent.items.map((item) => item.str).join(' ');  // Join text content items into a single string
-          })
-        );
+      const response = await fetch(`${import.meta.env.VITE_SERVER_URI}/api/pdf?filePath=${encodeURIComponent(filePath)}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch PDF");
       }
 
-      // Wait for all promises to resolve and return the concatenated text
-      const texts = await Promise.all(countPromises);
-      return texts.join('');
+      const blob = await response.blob();
+      const pdfUrl = URL.createObjectURL(blob);
+      window.open(pdfUrl, "_blank");
     } catch (error) {
-      console.error('Error extracting text from PDF:', error);
-      return '';
-    }
-  };
-  
-  const translateText = async (text, targetLanguage) => {
-    try {
-      const response = await fetch(import.meta.env.VITE_SERVER_URI+'/api/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, targetLanguage })
-      });
-      
-      const data = await response.json();
-      return data.translatedText;
-    } catch (error) {
-      console.error('Error translating text:', error);
-      return 'Translation failed';
+      console.error("Error fetching PDF:", error);
     }
   };
 
-  const handleLanguageChange = async (event) => {
-    const language = event.target.value;
-    setSelectedLanguage(language);
-  
-    try {
-      // Extract text from the PDF
-      const extractedText = await extractTextFromPDF(prescriptionPDF);
-  
-      // Translate the extracted text
-      const translatedText = await translateText(extractedText, language);
-  
-      // Create a downloadable plain text file
-      const textBlob = new Blob([translatedText], { type: "text/plain" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(textBlob);
-      link.download = `prescription-${language}.txt`;
-      link.click();
-  
-      // Cleanup URL object to prevent memory leaks
-      URL.revokeObjectURL(link.href);
-    } catch (error) {
-      console.error("Error translating or generating text file:", error);
-    }
-  };    
-  
-  const toggleDropdown = () => {
-    setShowDropdown(!showDropdown); // Toggle dropdown visibility
+  const formatDate = (isoString) => {
+    const date = new Date(isoString);
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
   };
 
   return (
@@ -148,42 +102,28 @@ function Entries({ Details = {} }) {
               </tr>
             </thead>
             <tbody>
-  
+
               {Details.medicalHistory && Details.medicalHistory.map((entry, index) => (
                 <tr key={index} className="text-sm md:text-normal bg-gray-100">
-                <td className="p-2 md:p-4">{index+1}</td>
-                <td>{Details.doctorName}</td>
-                <td>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste,
-                  sunt.
-                </td>
-                <td>
-                  <span className="p-2 pl-4 pr-4 bg-gray-400 text-black text-center rounded-3xl mt-2">
-                    {Details.prescribedDate}
-                  </span>
-                </td>
-                <td className="text-right p-2 md:p-4">
-                  <a
-                    onClick={toggleDropdown}
-                    className="underline cursor-pointer"
-                  >
-                    View PDF
-                  </a>
-                  {showDropdown && (
-                    <div className="mt-2">
-                      <select
-                        className="bg-gray-200 p-2 rounded-lg"
-                        onChange={handleLanguageChange}
-                        value={selectedLanguage}
-                      >
-                        <option value="en">English</option>
-                        <option value="hi">Hindi</option>
-                        <option value="te">Telugu</option>
-                      </select>
-                    </div>
-                  )}
-                </td>
-              </tr>
+                  <td className="p-2 md:p-4">{index + 1}</td>
+                  <td>{Details.medicalHistory[index].doctorName}</td>
+                  <td>
+                    Standard Medical Prescription (Ready to Download/Print)
+                  </td>
+                  <td>
+                    <span className="p-2 pl-4 pr-4 bg-gray-400 text-black text-center rounded-3xl mt-2">
+                      {formatDate(Details.medicalHistory[index].prescribedDate)}
+                    </span>
+                  </td>
+                  <td className="text-right p-2 md:p-4">
+                    <a
+                      onClick={() => viewPDF(Details.medicalHistory[index].prescribedFile)}
+                      className="underline cursor-pointer"
+                    >
+                      View PDF
+                    </a>
+                  </td>
+                </tr>
               ))}
             </tbody>
           </table>

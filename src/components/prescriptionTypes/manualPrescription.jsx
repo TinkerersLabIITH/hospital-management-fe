@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
 import jsPDF from "jspdf";
-import Tesseract from "tesseract.js";
 import SignaturePad from "signature_pad";
 
 function ManualPrescription({ Details = {} }) {
